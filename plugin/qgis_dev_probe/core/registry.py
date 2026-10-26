@@ -51,7 +51,7 @@ _SPECS = [
     ToolSpec("remove_layer", ACT),
     ToolSpec("run_algorithm", ACT, timeout_s=600.0),
     ToolSpec("reload_plugin", ACT, timeout_s=60.0),
-    ToolSpec("run_recipe", ACT, timeout_s=600.0),
+    ToolSpec("run_recipe", EXEC, timeout_s=600.0),
     # --- exec ---
     ToolSpec("execute_code", EXEC, timeout_s=60.0),
 ]

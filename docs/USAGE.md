@@ -57,7 +57,7 @@
 | `add_layer` / `remove_layer` | act | ローカルのレイヤの追加 / プロジェクトからの削除 |
 | `run_algorithm` | act | Processing の同期実行（実行中は QGIS の画面が止まる） |
 | `reload_plugin` | act | 別のプラグインの再読込（`qgis_dev_probe` 自身は不可） |
-| `run_recipe` | act | レシピの実行 |
+| `run_recipe` | exec | レシピの実行（任意コードの実行と同等のため exec 区分） |
 | `execute_code` | exec | 任意の Python の実行 |
 | `wait` | (MCP 側のみ) | 指定秒数の待機（最大 60 秒） |
 

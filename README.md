@@ -12,8 +12,8 @@ QGIS プラグイン開発者向けの**開発専用**ツール。AI クライ�
 | 区分 | ツール | 必要な権限 |
 |---|---|---|
 | observe | ping, get_info, list_windows, dump_widgets, list_actions, screenshot, list_layers, inspect_layer, list_algorithms, get_algorithm_params, list_plugins, read_log, list_recipes | 常時（readonly） |
-| act | set_widget, click_widget, trigger_action, close_window, add_layer, remove_layer, run_algorithm, reload_plugin, run_recipe | モード `interactive` |
-| exec | execute_code | `interactive` + セッション限りの許可チェック |
+| act | set_widget, click_widget, trigger_action, close_window, add_layer, remove_layer, run_algorithm, reload_plugin | モード `interactive` |
+| exec | execute_code, run_recipe | `interactive` + セッション限りの許可チェック |
 | local | wait（MCP 側のみ） | - |
 
 画面を開いて確認する手順（`trigger_action` → `list_windows` → `dump_widgets` → `screenshot` → `close_window`）は [docs/SCENARIOS.md](docs/SCENARIOS.md)。
