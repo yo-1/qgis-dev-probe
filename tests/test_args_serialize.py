@@ -59,6 +59,46 @@ class _FakeQDate:
         return datetime.date(2026, 10, 24)
 
 
+class _FakeNullBrokenRuntime:
+    """削除済み SIP ラッパーを模した、isNull が RuntimeError を投げる値。"""
+
+    def isNull(self):  # noqa: N802
+        raise RuntimeError("wrapped C/C++ object has been deleted")
+
+    def __repr__(self):
+        return "<broken-runtime>"
+
+
+class _FakeNullBrokenButDateTime:
+    """isNull は壊れているが日時変換は生きている値。変換で救済されることを期待する。"""
+
+    def isNull(self):  # noqa: N802
+        raise RuntimeError("wrapped C/C++ object has been deleted")
+
+    def toPyDateTime(self):  # noqa: N802
+        return datetime.datetime(2026, 10, 24, 1, 2, 3)
+
+    def __repr__(self):
+        return "<broken-but-datetime>"
+
+
+class _NullCheckBoom(Exception):
+    """isNull が投げる想定外の例外。"""
+
+
+class _FakeNullCustomError:
+    """isNull が想定外の例外を投げる値。後続の変換で救済されることを期待する。"""
+
+    def isNull(self):  # noqa: N802
+        raise _NullCheckBoom("unexpected")
+
+    def toPyDate(self):  # noqa: N802
+        return datetime.date(2026, 10, 24)
+
+    def __repr__(self):
+        return "<custom-error>"
+
+
 class SerializeTests(unittest.TestCase):
     def test_special_floats(self):
         self.assertEqual(S.to_jsonable(float("nan")), "NaN")
@@ -83,6 +123,14 @@ class SerializeTests(unittest.TestCase):
     def test_qt_like_objects(self):
         self.assertIsNone(S.to_jsonable(_FakeNull()))
         self.assertEqual(S.to_jsonable(_FakeQDate()), "2026-10-24")
+
+    def test_null_check_failures(self):
+        # isNull の例外は伝播させず、変換できなければ repr に縮退する
+        self.assertEqual(S.to_jsonable(_FakeNullBrokenRuntime()), "<broken-runtime>")
+        # isNull が壊れていても、日時変換が生きていれば変換する（旧版互換）
+        self.assertEqual(S.to_jsonable(_FakeNullBrokenButDateTime()), "2026-10-24T01:02:03")
+        # 想定外の例外でも同様に、後続の変換で救済する
+        self.assertEqual(S.to_jsonable(_FakeNullCustomError()), "2026-10-24")
 
     def test_limits(self):
         self.assertTrue(S.to_jsonable("x" * (S.MAX_STR + 5)).endswith("chars]"))

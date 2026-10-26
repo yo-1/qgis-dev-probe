@@ -17,13 +17,19 @@ PR ごとに自動実行される。手動実行は workflow_dispatch からも�
 
 - 公式サイトと同じ Bandit（要件 bandit~=1.9）でプラグイン全体を走査する。
 - 生のレポート（スキップなし）は artifact `bandit-raw-report` に必ず残す。
-  抑制で検出自体が見えなくなることはない。
+  抑制で検出自体が見えなくなることはない。なお Bandit は走査ツリー内の
+  `.bandit` を自動発見してスキップを適用するため、生レポートは `.bandit` を
+  除いた複製ツリーで取得する。
 - ゲート判定は `scripts/check_bandit_gate.py` が公式の対応付けで行う:
   - Bandit LOW → info、MEDIUM → warning、HIGH → critical
   - 例外として B105〜B107 は MEDIUM でも critical に格上げ（公式の bandit_rules.json の注記による）
   - critical があれば失敗。critical はスキップ不可。
   - warning / info は、プラグインフォルダの `.bandit` に `skips:` で列挙された
     ルールだけゲート対象から外れる（公式の ZIP 同梱 `.bandit` と同じファイルを使う）。
+  - スキップには箇所の限定管理がある。B102 は `core/recipes.py` と
+    `qgis_side/handlers.py` の2箇所だけが対象で、他のファイルで B102 が
+    検出された場合はスキップを適用せずゲートが失敗する（将来の新規 exec を
+    見逃さないため）。
 
 ### Qt6 enum チェック（静的近似）
 

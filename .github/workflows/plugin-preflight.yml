@@ -21,9 +21,14 @@ jobs:
       - name: Install Bandit (公式サイトの要件に合わせる)
         run: python -m pip install "bandit~=1.9"
       - name: Run Bandit (raw, no skips)
+        # Bandit は走査ツリー内の .bandit を自動発見してスキップを適用するため、
+        # 生レポートは .bandit を除いた複製ツリーで取得する（検出を隠さないため）。
         run: |
-          bandit -r plugin/qgis_dev_probe -f txt -o bandit-raw.txt || true
-          bandit -r plugin/qgis_dev_probe -f json -o bandit-raw.json || true
+          mkdir -p /tmp/rawtree
+          cp -r plugin/qgis_dev_probe /tmp/rawtree/
+          rm -f /tmp/rawtree/qgis_dev_probe/.bandit
+          (cd /tmp/rawtree && bandit -r qgis_dev_probe -f txt -o $GITHUB_WORKSPACE/bandit-raw.txt) || true
+          (cd /tmp/rawtree && bandit -r qgis_dev_probe -f json -o $GITHUB_WORKSPACE/bandit-raw.json) || true
           cat bandit-raw.txt
       - name: Gate (critical はスキップ不可、warning は .bandit の skips で抑制可)
         run: python scripts/check_bandit_gate.py bandit-raw.json plugin/qgis_dev_probe
