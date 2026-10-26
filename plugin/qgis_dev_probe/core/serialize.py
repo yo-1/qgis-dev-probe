@@ -76,8 +76,9 @@ def to_jsonable(obj: Any, _depth: int = 0) -> Any:
         try:
             if is_null():
                 return None
-        except Exception:  # noqa: BLE001
-            pass
+        except (RuntimeError, TypeError, ValueError, AttributeError):
+            # SIP/Qt ラッパーの失効や変換不能は通常の Python 値として扱う。
+            return _clip(repr(obj))
     converted = _qt_datetime_like(obj)
     if converted is not None:
         return to_jsonable(converted, _depth + 1)

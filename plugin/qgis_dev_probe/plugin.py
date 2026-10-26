@@ -44,7 +44,7 @@ class QgisDevProbePlugin:
         self.pump = MainThreadPump(self.queue)
         self.server: ProbeServer | None = None
         self.dispatcher: Dispatcher | None = None
-        self.token = ""
+        self.token: str | None = None
         self._action: QAction | None = None
         self._dialog = None
         self._log_connected = False
@@ -108,7 +108,9 @@ class QgisDevProbePlugin:
         if self.server is not None:
             self.server.stop()
             self.server = None
-            remove_endpoint_if_token(self.config.endpoint_file, self.token)
+            if self.token is not None:
+                remove_endpoint_if_token(self.config.endpoint_file, self.token)
+                self.token = None
             self._log("server stopped")
         self.pump.stop()
 
@@ -136,7 +138,7 @@ class QgisDevProbePlugin:
             self._log_connected = False
 
     def _on_message(self, message, tag, level) -> None:
-        names = {Qgis.Info: "info", Qgis.Warning: "warning", Qgis.Critical: "critical", Qgis.Success: "success"}
+        names = {Qgis.MessageLevel.Info: "info", Qgis.MessageLevel.Warning: "warning", Qgis.MessageLevel.Critical: "critical", Qgis.MessageLevel.Success: "success"}
         self.logbuffer.add(message, tag, names.get(level, str(level)))
 
     def _log(self, message: str) -> None:
