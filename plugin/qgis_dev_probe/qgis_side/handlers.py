@@ -242,7 +242,7 @@ def _is_optional(parameter: Any) -> bool:
     except Exception:  # noqa: BLE001 - 旧 API へフォールバック
         from qgis.core import QgsProcessingParameterDefinition
 
-        return bool(parameter.flags() & QgsProcessingParameterDefinition.FlagOptional)
+        return bool(parameter.flags() & QgsProcessingParameterDefinition.Flag.FlagOptional)
 
 
 def h_list_algorithms(ctx: HandlerContext, args: dict) -> dict:
