@@ -24,6 +24,12 @@ from pathlib import Path
 
 FORCED_CRITICAL = {"B105", "B106", "B107"}
 
+# スキップを認める箇所の限定管理。対象ルールが想定外のファイルで検出された
+# 場合はスキップを適用せず、ゲートを失敗させる（将来の新規 exec を見逃さない）。
+SKIP_LOCATION_ALLOWLIST = {
+    "B102": ("core/recipes.py", "qgis_side/handlers.py"),
+}
+
 
 def site_severity(issue: dict) -> str:
     if issue.get("issue_severity") == "HIGH" or issue.get("test_id") in FORCED_CRITICAL:
@@ -58,7 +64,12 @@ def main() -> int:
             note = "（critical はスキップ不可）" if issue.get("test_id") in skips else ""
             print(f"[critical] {location} {label}{note}")
         elif issue.get("test_id") in skips:
-            print(f"[skipped ] {location} {label} （プロジェクト .bandit の skips による）")
+            allowed = SKIP_LOCATION_ALLOWLIST.get(issue.get("test_id"))
+            if allowed is not None and not any(issue.get("filename", "").endswith(p) for p in allowed):
+                blocking += 1
+                print(f"[unapproved] {location} {label} （スキップ対象として承認された箇所ではないため失敗）")
+            else:
+                print(f"[skipped ] {location} {label} （プロジェクト .bandit の skips による）")
         else:
             print(f"[{severity:8}] {location} {label}")
     if blocking:

@@ -70,7 +70,7 @@ class _FakeNullBrokenRuntime:
 
 
 class _FakeNullBrokenButDateTime:
-    """isNull は壊れているが日時変換は生きている値。想定内の例外では repr に縮退する。"""
+    """isNull は壊れているが日時変換は生きている値。変換で救済されることを期待する。"""
 
     def isNull(self):  # noqa: N802
         raise RuntimeError("wrapped C/C++ object has been deleted")
@@ -125,10 +125,11 @@ class SerializeTests(unittest.TestCase):
         self.assertEqual(S.to_jsonable(_FakeQDate()), "2026-10-24")
 
     def test_null_check_failures(self):
-        # 想定内の例外（削除済みラッパー等）は repr に縮退する
+        # isNull の例外は伝播させず、変換できなければ repr に縮退する
         self.assertEqual(S.to_jsonable(_FakeNullBrokenRuntime()), "<broken-runtime>")
-        self.assertEqual(S.to_jsonable(_FakeNullBrokenButDateTime()), "<broken-but-datetime>")
-        # 想定外の例外は伝播させず、後続の変換で救済する
+        # isNull が壊れていても、日時変換が生きていれば変換する（旧版互換）
+        self.assertEqual(S.to_jsonable(_FakeNullBrokenButDateTime()), "2026-10-24T01:02:03")
+        # 想定外の例外でも同様に、後続の変換で救済する
         self.assertEqual(S.to_jsonable(_FakeNullCustomError()), "2026-10-24")
 
     def test_limits(self):

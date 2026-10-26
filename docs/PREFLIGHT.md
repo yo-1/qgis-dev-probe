@@ -26,6 +26,10 @@ PR ごとに自動実行される。手動実行は workflow_dispatch からも�
   - critical があれば失敗。critical はスキップ不可。
   - warning / info は、プラグインフォルダの `.bandit` に `skips:` で列挙された
     ルールだけゲート対象から外れる（公式の ZIP 同梱 `.bandit` と同じファイルを使う）。
+  - スキップには箇所の限定管理がある。B102 は `core/recipes.py` と
+    `qgis_side/handlers.py` の2箇所だけが対象で、他のファイルで B102 が
+    検出された場合はスキップを適用せずゲートが失敗する（将来の新規 exec を
+    見逃さないため）。
 
 ### Qt6 enum チェック（静的近似）
 

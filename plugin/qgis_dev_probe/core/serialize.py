@@ -76,11 +76,9 @@ def to_jsonable(obj: Any, _depth: int = 0) -> Any:
         null_state: bool | None = None
         try:
             null_state = bool(is_null())
-        except (RuntimeError, TypeError, ValueError, AttributeError):
-            # SIP/Qt ラッパーの失効や型の不一致は値の破損とみなし、repr に縮退する。
-            return _clip(repr(obj))
-        except Exception:  # noqa: BLE001 - 想定外の例外でもシリアライズ自体は止めない
-            # 判定不能として、後続の日時変換などでの救済に委ねる。
+        except Exception:  # noqa: BLE001 - 壊れた値でもシリアライズ自体は止めない
+            # isNull が判定できない値でも、後続の日時変換などで救える場合があるため、
+            # 判定不能として変換へ進む（B110 の指摘に対し、黙って捨てず経路を明示する）。
             null_state = None
         if null_state:
             return None
