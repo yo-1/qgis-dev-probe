@@ -1,0 +1,66 @@
+name: Plugin preflight (official review)
+
+# plugins.qgis.org の公式審査（セキュリティスキャン / Qt6 チェック）を
+# 提出前に再現するための事前チェック。詳細は docs/PREFLIGHT.md。
+# ここを通過した package ジョブの artifact（submission-zip）だけを
+# 提出用 ZIP として扱う運用とする。
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  bandit:
+    name: Bandit (official severity mapping)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Bandit (公式サイトの要件に合わせる)
+        run: python -m pip install "bandit~=1.9"
+      - name: Run Bandit (raw, no skips)
+        run: |
+          bandit -r plugin/qgis_dev_probe -f txt -o bandit-raw.txt || true
+          bandit -r plugin/qgis_dev_probe -f json -o bandit-raw.json || true
+          cat bandit-raw.txt
+      - name: Gate (critical はスキップ不可、warning は .bandit の skips で抑制可)
+        run: python scripts/check_bandit_gate.py bandit-raw.json plugin/qgis_dev_probe
+      - name: Upload raw Bandit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-raw-report
+          path: |
+            bandit-raw.txt
+            bandit-raw.json
+
+  qt6-enum:
+    name: Qt6 enum check (static approximation)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run Qt6 enum check
+        run: python scripts/qt6_enum_check.py plugin/qgis_dev_probe
+
+  package:
+    name: Package build and verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build submission ZIP
+        run: python scripts/package_plugin.py
+      - name: Verify ZIP structure, metadata, privacy gate
+        run: python scripts/verify_package.py dist/qgis_dev_probe-*.zip
+      - name: Upload submission ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: submission-zip
+          path: dist/qgis_dev_probe-*.zip
