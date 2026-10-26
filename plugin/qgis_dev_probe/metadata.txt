@@ -2,7 +2,7 @@
 name=QGIS Dev Probe（開発用・AI実機検証ブリッジ）
 qgisMinimumVersion=3.44
 description=【開発専用】AIにプラグインを書かせる時代の、実機検証をAI自身にやらせるためのブリッジ。MCPクライアントがQGISを観察・操作して、「作ったものが本当に動くか」を確かめます。 / Development-only. A bridge that lets AI verify its own work on a real QGIS — MCP clients inspect and operate QGIS to check that what was built actually runs.
-version=0.1.0
+version=0.1.1
 author=yo-1
 email=yo-1@geographic-information.net
 about=【開発専用・本番機では使用禁止】プラグイン開発の実機検証は、画面を見て、操作して、結果を確かめる地味で面倒な作業です。このプラグインは、その検証をAIクライアント(MCP)自身に行わせるための道具です。AIは localhost 上のサーバー(手動起動・既定は停止)経由で、ウィンドウや部品の取得、スクリーンショット、Processing の実行、プラグインの再読込ができます。execute_code は既定で無効で、セッションごとにユーザーが明示的に許可した場合だけ動きます。対象は QGIS 3.44 のみで、他バージョンは未検証です。なお、このプラグインには目的上必要な exec() の使用が2箇所あります（セッション許可制の execute_code と、ローカルに置いたレシピファイルの読込）。 / Development only — do not use on production machines. Verifying a plugin on a real machine is tedious: look at the screen, click through, check the result. This plugin lets an MCP client do that verification itself, through a localhost-only server (started manually, off by default): listing windows and widgets, taking screenshots, running Processing algorithms, and reloading plugins. The execute_code tool is disabled by default and runs only when the user explicitly allows it for the current session. Only QGIS 3.44 is the intended target; other versions are untested. Note: this plugin contains two intentional exec() uses (the session-gated execute_code tool and local recipe loading), which are core to its purpose.

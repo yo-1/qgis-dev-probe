@@ -73,12 +73,17 @@ def to_jsonable(obj: Any, _depth: int = 0) -> Any:
     # QVariant の NULL / Qt の日時など（QGIS 非依存のダックタイピング）
     is_null = getattr(obj, "isNull", None)
     if callable(is_null):
+        null_state: bool | None = None
         try:
-            if is_null():
-                return None
+            null_state = bool(is_null())
         except (RuntimeError, TypeError, ValueError, AttributeError):
-            # SIP/Qt ラッパーの失効や変換不能は通常の Python 値として扱う。
+            # SIP/Qt ラッパーの失効や型の不一致は値の破損とみなし、repr に縮退する。
             return _clip(repr(obj))
+        except Exception:  # noqa: BLE001 - 想定外の例外でもシリアライズ自体は止めない
+            # 判定不能として、後続の日時変換などでの救済に委ねる。
+            null_state = None
+        if null_state:
+            return None
     converted = _qt_datetime_like(obj)
     if converted is not None:
         return to_jsonable(converted, _depth + 1)

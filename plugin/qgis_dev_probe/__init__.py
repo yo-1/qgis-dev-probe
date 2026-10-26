@@ -4,7 +4,7 @@
 QGIS 依存の読み込みは classFactory 内に遅延させている。
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def classFactory(iface):  # noqa: N802 - QGIS が要求する名前
