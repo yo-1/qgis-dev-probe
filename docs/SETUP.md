@@ -178,7 +178,7 @@ claude mcp list     # qgis-dev-probe が Connected になれば登録成功
 
 ### レシピのフォルダ（任意）
 
-`run_recipe` を使うには、QGIS Dev Probe のダイアログの「レシピ フォルダ / Recipe dir」に、レシピ（`.py`）を置いたフォルダを指定します。同梱例は、リポジトリの `recipes_example` です（`C:\Users\<ユーザー名>\Documents\qgis-dev-probe\recipes_example`）。
+`run_recipe` を使うには、QGIS Dev Probe のダイアログの「レシピ フォルダ / Recipe dir」に、レシピ（`.py`）を置いたフォルダを指定します。同梱例は、リポジトリの `recipes_example` です（`C:\Users\<ユーザー名>\Documents\qgis-dev-probe\recipes_example`）。レシピは任意コードの実行と同等のため exec 区分で、`execute_code` と同じくダイアログの「コード実行を許可」を有効にする必要があります（再起動で無効に戻ります）。
 
 - 設定できるのは**サーバー停止中のみ**です。いったん「サーバー停止」を押し、フォルダを入れて、再度「サーバー起動」を押します。
 - **信頼できるフォルダだけ**を指定してください。レシピは Python をそのまま実行します。

@@ -37,6 +37,14 @@ class PolicyTests(unittest.TestCase):
         with self.assertRaises(PolicyDenied):
             _policy(mode=MODE_READONLY, allow_exec=True).check(spec)
 
+    def test_run_recipe_is_exec_gated(self):
+        # レシピは任意コードの実行なので、execute_code と同じ EXEC 区分にする
+        spec = TOOL_SPECS["run_recipe"]
+        self.assertEqual(spec.category, EXEC)
+        with self.assertRaises(PolicyDenied):
+            _policy(mode=MODE_INTERACTIVE).check(spec)
+        _policy(mode=MODE_INTERACTIVE, allow_exec=True).check(spec)
+
     def test_policy_follows_live_config_changes(self):
         cfg = ProbeConfig().validate()
         policy = Policy(cfg)
@@ -64,9 +72,11 @@ class RegistryTests(unittest.TestCase):
 
     def test_state_changing_tools_are_not_observe(self):
         for name in ("set_widget", "click_widget", "trigger_action", "close_window", "add_layer", "remove_layer",
-                     "run_algorithm", "reload_plugin", "run_recipe"):
+                     "run_algorithm", "reload_plugin"):
             self.assertEqual(TOOL_SPECS[name].category, ACT, name)
+        # 任意コードの実行に当たる2つは EXEC（許可経路監査に基づく）
         self.assertEqual(TOOL_SPECS["execute_code"].category, EXEC)
+        self.assertEqual(TOOL_SPECS["run_recipe"].category, EXEC)
 
     def test_only_thread_safe_tools_skip_main_thread(self):
         off_main = {n for n, s in TOOL_SPECS.items() if not s.main_thread}

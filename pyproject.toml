@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qgis-dev-probe"
-version = "0.1.1"
+version = "0.1.2"
 description = "Development-time MCP server and QGIS plugin to observe and drive QGIS (GUI, Processing) from AI clients."
 readme = "README.md"
 requires-python = ">=3.10"
