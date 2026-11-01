@@ -61,6 +61,9 @@ QGIS を再起動すると無効に戻ります（保存されません）。</p
 <li><b>Window allowlist</b>: 操作対象を制限します。</li>
 <li>どちらもサーバー<b>停止中のみ</b>編集できます。</li>
 </ul>
+<h4>ドキュメント / Docs</h4>
+<p><a href="https://github.com/yo-1/qgis-dev-probe/blob/main/docs/SETUP.md">セットアップ手順</a><br>
+<a href="https://github.com/yo-1/qgis-dev-probe/blob/main/docs/CLIENTS.md">クライアント接続ガイド（Claude / Codex の形態別）</a></p>
 <h4>接続情報 / Endpoint</h4>
 <p><small>{escape(endpoint_file)}</small></p>
 """
