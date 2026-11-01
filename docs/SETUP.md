@@ -60,9 +60,8 @@ python --version       # 版が出ること。「Python」とだけ出るなら�
 
 通常は、QGIS の公式プラグインリポジトリから入れます（ZIP は不要です）。
 
-1. QGIS: プラグイン → プラグインの管理とインストール → 「設定」で「実験的プラグインも表示する」を有効にします（このプラグインは実験的プラグインのため、この設定がないと一覧に出ません）。
-2. 「すべて」のタブで `QGIS Dev Probe` を検索し、「プラグインをインストール」を押します。
-3. 「インストール済み」で `QGIS Dev Probe（開発用・AI実機検証ブリッジ）` にチェックが入っていることを確認します（プラグイン管理の一覧の名前は「ブリッジ」付き、手順 3 のメニュー名は「ブリッジ」なしで、どちらも正しい表記です）。
+1. QGIS: プラグイン → プラグインの管理とインストール → 「すべて」のタブで `QGIS Dev Probe` を検索し、「プラグインをインストール」を押します（0.1.3 以降は実験的プラグインではないため、「実験的プラグインも表示する」の設定は不要です。0.1.2 以前を入れる場合は、その設定を有効にしてください）。
+2. 「インストール済み」で `QGIS Dev Probe（開発用・AI実機検証ブリッジ）` にチェックが入っていることを確認します（プラグイン管理の一覧の名前は「ブリッジ」付き、手順 3 のメニュー名は「ブリッジ」なしで、どちらも正しい表記です）。
 
 ZIP で入れる場合（開発用・代替）: ソースから ZIP を作る（下記）か、[Releases](https://github.com/yo-1/qgis-dev-probe/releases) から `qgis_dev_probe-<version>.zip` をダウンロードします。Releases の版は公式リポジトリより遅れることがあります。ブラウザで入れない場合は、コマンドでも取得できます（`Downloads` の下に `release-check` フォルダを作って保存します）。
 
@@ -201,7 +200,7 @@ claude mcp list     # qgis-dev-probe が Connected になれば登録成功
 | `pip install -e .` が `File "setup.py" or "setup.cfg" not found ... editable mode currently requires a setuptools-based build` で失敗する | 仮想環境の `pip` が古い（21.3 未満）。Python 3.10.2 の `venv` が同梱する pip は 21.2.4 で、`pyproject.toml` だけのプロジェクトを editable で入れられない（Windows の実機で確認） | `.\.venv\Scripts\python.exe -m pip install --upgrade pip` を実行してから、再度 `pip install -e .` |
 | `python -m venv .venv` が `Python` とだけ表示する。`.venv` ができない | `python` が Microsoft Store のエイリアスで、実体の Python ではない | `Get-Command python` が `WindowsApps` 配下なら該当。`py -3 --version` が通るなら `py -3 -m venv .venv` を使う。通らなければ、python.org などで Python 3.10 以上を入れる。`pip install -e .` は、`.venv` ができるまで実行しない（`pip` が `Defaulting to user installation` と表示したら、仮想環境の外に入っている） |
 | `git clone` が `destination path ... already exists and is not an empty directory` | その場所に同名のフォルダがある | 別の名前で clone する（`git clone <URL> <フォルダ名>`）か、既存のフォルダを使う（中身を確認してから） |
-| プラグインが一覧に出ない | 実験的プラグインが非表示 | 「設定」で実験的プラグインを表示する |
+| プラグインが一覧に出ない | 旧版（0.1.2 以前）は実験的プラグインで非表示だった。0.1.3 以降は一覧の未更新や検索の入力ミスのことが多い | 0.1.2 以前なら「設定」で実験的プラグインを表示する。0.1.3 以降はプラグイン管理を開き直して一覧を更新し、検索語を見直す |
 | 再起動後にプラグインが無効になる | `metadata.txt` の必須項目の欠落など（このツールの検証対象プラグインで実際に起きた事例） | QGIS の起動時のログ（ログメッセージ → プラグイン）でエラーを確認する |
 | タイムアウトする | メインスレッドが塞がっている（長い処理、モーダルの待機など） | 長い処理は `timeout_s` を指定する。`details.started` が false なら、処理が始まる前のタイムアウト |
 
