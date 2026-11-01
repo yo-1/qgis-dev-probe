@@ -82,7 +82,10 @@ class ProbeDialog(QDialog):
         self.info_label.setWordWrap(True)
         self.info_label.setTextFormat(Qt.TextFormat.RichText)
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-        self.info_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.info_label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse | Qt.TextInteractionFlag.LinksAccessibleByMouse
+        )
+        self.info_label.setOpenExternalLinks(True)
         self.info_panel = QFrame(self)
         self.info_panel.setObjectName("infoPanel")
         self.info_panel.setFrameShape(QFrame.Shape.StyledPanel)

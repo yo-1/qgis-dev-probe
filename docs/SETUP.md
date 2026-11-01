@@ -3,7 +3,7 @@
 初めて導入する人が、**導入 → 起動 → 疎通確認**まで進むための手順です。ツールの使い方は [USAGE.md](USAGE.md)。
 
 > 開発専用です。共有・本番の QGIS には入れないでください（[SECURITY.md](../SECURITY.md)）。
-> 実機確認済みの環境: Windows 11 / QGIS 3.44.13 / Claude Desktop・Claude Code（Windows の手順 2 は Python 3.10.2、Linux の手順 2 は Python 3.12.3 で確認）。Codex・他の QGIS バージョン・macOS は**未確認**です（[VERIFY.md](VERIFY.md)）。
+> 実機確認済みの環境: Windows 11 / QGIS 3.44.13 / Claude Desktop・Claude Code・Codex デスクトップ（Windows の手順 2 は Python 3.10.2、Linux の手順 2 は Python 3.12.3 で確認）。他の QGIS バージョン・macOS は**未確認**です（[VERIFY.md](VERIFY.md)）。
 
 ## 0. この文書の約束事（先に読んでください）
 
@@ -29,7 +29,7 @@
 
 | 部品 | 入れる場所 | 入手方法 |
 |---|---|---|
-| QGIS プラグイン `qgis_dev_probe` | QGIS | Release の `qgis_dev_probe-<version>.zip` |
+| QGIS プラグイン `qgis_dev_probe` | QGIS | 公式プラグインリポジトリ（手順 1）。開発用は ZIP でも可 |
 | MCP サーバー `qgis-dev-probe-mcp` | AI クライアントを動かす PC | このリポジトリを clone して `pip install -e .` |
 
 ```
@@ -53,12 +53,18 @@ python --version       # 版が出ること。「Python」とだけ出るなら�
 - Python 3.10 以上（MCP サーバー用。QGIS 内蔵の Python とは別です）。
 - **Windows の注意:** `python` が `...\WindowsApps\python.exe` を指している場合は、Microsoft Store の案内（アプリ実行エイリアス）で、実体ではありません。この文書では、`py -3` を使います。`py -3 --version` も通らない場合は、python.org から Python を入れてください。
 - `mcp>=2.3,<3`（`pip install -e .` で入ります。v1 系の `FastMCP` とは非互換）。
-- 対応クライアント: stdio で MCP サーバーを起動できるもの。**ChatGPT の Web/アプリは対象外**です。
-- **リポジトリが private の間は、GitHub の認証が必要です。** 認証なしの `git clone` は `could not read Username for 'https://github.com'` で失敗し、Releases の ZIP もログインなしではダウンロードできません。事前に GitHub CLI で認証します（`gh auth login` → `gh auth setup-git`）。認証できない環境には、ソースの zip を別途渡して展開してください（git は不要です）。
+- 対応クライアント: stdio で MCP サーバーを起動できるもの（Claude Desktop、Claude Code、Codex デスクトップ）。どの AI のどの形態が使えるかは、[CLIENTS.md](CLIENTS.md) の冒頭に整理しています。**Claude / ChatGPT のブラウザ版とスマホアプリは対象外**です。
+- リポジトリは公開されているので、`git clone` に GitHub の認証は不要です。
 
 ## 2. 手順 1: QGIS プラグインを入れる
 
-1. [Releases](https://github.com/yo-1/qgis-dev-probe/releases) から `qgis_dev_probe-<version>.zip` をダウンロードします。ブラウザで入れない場合は、コマンドでも取得できます（`Downloads` の下に `release-check` フォルダを作って保存します）。
+通常は、QGIS の公式プラグインリポジトリから入れます（ZIP は不要です）。
+
+1. QGIS: プラグイン → プラグインの管理とインストール → 「設定」で「実験的プラグインも表示する」を有効にします（このプラグインは実験的プラグインのため、この設定がないと一覧に出ません）。
+2. 「すべて」のタブで `QGIS Dev Probe` を検索し、「プラグインをインストール」を押します。
+3. 「インストール済み」で `QGIS Dev Probe（開発用・AI実機検証ブリッジ）` にチェックが入っていることを確認します（プラグイン管理の一覧の名前は「ブリッジ」付き、手順 3 のメニュー名は「ブリッジ」なしで、どちらも正しい表記です）。
+
+ZIP で入れる場合（開発用・代替）: ソースから ZIP を作る（下記）か、[Releases](https://github.com/yo-1/qgis-dev-probe/releases) から `qgis_dev_probe-<version>.zip` をダウンロードします。Releases の版は公式リポジトリより遅れることがあります。ブラウザで入れない場合は、コマンドでも取得できます（`Downloads` の下に `release-check` フォルダを作って保存します）。
 
 ```powershell
 # PowerShell 7 / 場所は問わない（保存先を絶対パスで指定している）
@@ -67,9 +73,7 @@ gh release download v0.1.0 --repo yo-1/qgis-dev-probe --pattern "*.zip" --dir "$
 Get-ChildItem "$HOME\Downloads\release-check" | Select-Object Name, Length
 ```
 
-2. QGIS: プラグイン → プラグインの管理とインストール → ZIP からインストール → 上の ZIP を指定 → プラグインをインストール。
-3. 「インストール済み」で `QGIS Dev Probe（開発用・AI実機検証ブリッジ）` にチェックが入っていることを確認します（プラグイン管理の一覧の名前は「ブリッジ」付き、手順 3 のメニュー名は「ブリッジ」なしで、どちらも正しい表記です）。
-   - 実験的プラグイン（`experimental=True`）なので、一覧に出ない場合は「設定」で「実験的プラグインも表示する」を有効にします。
+ZIP を使う場合は、プラグイン管理の「ZIP からインストール」でその ZIP を指定します。入れた後は、公式リポジトリの場合と同じく「インストール済み」でチェックを確認してください。
 
 ソースから ZIP を作る場合（開発者向け。手順 2 でリポジトリを clone した後に実行します）:
 
@@ -102,7 +106,7 @@ py -3 -m venv .venv                          # python が Store のエイリア�
 Test-Path .\.venv\Scripts\python.exe         # True であること。False なら、ここで止めてトラブルシューティングを見る
 .\.venv\Scripts\python.exe -m pip install --upgrade pip   # 仮想環境の中の pip だけを更新する（古い pip では、次の行が失敗する）
 .\.venv\Scripts\python.exe -m pip install -e .
-.\.venv\Scripts\python.exe -c "import qgis_dev_probe_mcp as m; print(m.__version__)"   # 0.1.0 と表示される
+.\.venv\Scripts\python.exe -c "import qgis_dev_probe_mcp as m; print(m.__version__)"   # 導入した版（例: 0.1.2）が表示される
 ```
 
 Linux / macOS（Bash）。Linux（Ubuntu 24.04 / Python 3.12.3）で実機確認済みです。
@@ -117,10 +121,10 @@ pwd                                          # .../qgis-dev-probe であるこ�
 python3 -m venv .venv
 ./.venv/bin/python -m pip install --upgrade pip
 ./.venv/bin/python -m pip install -e .
-./.venv/bin/python -c "import qgis_dev_probe_mcp as m; print(m.__version__)"   # 0.1.0 と表示される
+./.venv/bin/python -c "import qgis_dev_probe_mcp as m; print(m.__version__)"   # 導入した版（例: 0.1.2）が表示される
 ```
 
-- 成功の目印: `Successfully installed ... qgis-dev-probe-0.1.0` と、最後の `0.1.0`。**`Defaulting to user installation` が出たら、仮想環境の外に入っています**（`.venv` ができていない）。トラブルシューティングを見てください。
+- 成功の目印: `Successfully installed ... qgis-dev-probe-<版>` と、最後に表示される版番号が一致すること。**`Defaulting to user installation` が出たら、仮想環境の外に入っています**（`.venv` ができていない）。トラブルシューティングを見てください。
 - `git clone` が `could not read Username` で失敗したら、事前確認の GitHub 認証を済ませてから再実行します。`destination path ... already exists` と出たら、すでに同名のフォルダがあります。
 - 仮想環境は有効化せず、`.venv` の `python.exe` を直接呼びます。`Activate.ps1` を使わないので、PowerShell の実行ポリシーの影響を受けません。
 - 仮想環境の Python のパスは、クライアントへの登録（手順 4）で使います。次のコマンドで、絶対パスを表示できます。
