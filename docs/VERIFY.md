@@ -20,9 +20,9 @@
 | 8 | `reload_plugin` | ✅ `db_manager` で unload→load→start が成功。コード変更の反映は行18で確認。`qgis_dev_probe` 自身は設計どおり拒否 |
 | 9 | `QgsProcessingFeedback` サブクラス | ✅ ログ収集は動作。⬜ `Qgis.ProcessingParameterFlag.Optional` の分岐（`optional` が返ることは確認） |
 | 10 | メッセージログ連携 | ✅ `read_log` に QGIS のメッセージ・Python 警告が入る |
-| 11 | 設定保存・`allow_exec` 非保存 | ✅ モード・レシピフォルダ等の設定は再起動後も維持（rc4）。`allow_exec`: 許可にチェック → QGIS を再起動 → 設定ダイアログでチェックが外れていることを確認（rc7、利用者の目視報告。再起動後はサーバー停止のため `policy_denied` の応答までは未確認） |
-| 12 | クライアント接続 | ✅ Claude Desktop（`ping`/`list_windows`/`screenshot`/`list_actions`/`trigger_action`）。Claude Code（v2.1.310）: `claude mcp add` → `claude mcp list` で Connected、`/login` 後に `list_actions` を実行し 10 件取得を確認（rc6）。⬜ Codex |
-| 13 | GitHub Actions CI | ✅ 10 回連続で成功（rc6 時点、利用者の画面で確認）。以降の push 分は未確認 |
+| 11 | 設定保存・`allow_exec` 非保存 | ✅ モード・レシピフォルダ等の設定は再起動後も維持（rc4）。`allow_exec`: 許可にチェック → QGIS を再起動 → 設定ダイアログでチェックが外れていることを確認（rc7、利用者の目視報告）。2026-10-30 の回帰確認でも、再起動後にチェックが外れていること（B3）と、許可するまで `execute_code` が拒否されること（C）を再確認 |
+| 12 | クライアント接続 | ✅ Claude Desktop（`ping`/`list_windows`/`screenshot`/`list_actions`/`trigger_action`）。Claude Code（v2.1.310）: `claude mcp add` → `claude mcp list` で Connected、`/login` 後に `list_actions` を実行し 10 件取得を確認（rc6）。✅ Codex（デスクトップ）: 2026-10-24 にアプリ画面から登録し `ping` / `get_info` を確認。以後、0.1.2 の実機回帰確認（2026-10-28〜30）も Codex デスクトップから実施 |
+| 13 | GitHub Actions CI | ✅ 10 回連続で成功（rc6 時点、利用者の画面で確認）。以後も PR ごとに CI が成功している（2026-11-03 の PR #10 時点まで） |
 | 14 | Stop→Start 後の応答 | ✅（修正後）。修正前は全ツールがタイムアウトした不具合を発見・修正 |
 | 15 | メニュー項目/QAction の操作 | `click_widget` は QAction 非対応（仕様）。rc6 で `list_actions` / `trigger_action` を追加。✅ 実機確認: `list_actions` で MORIZON / Dev Probe の項目を取得、`trigger_action` で「MORIZON Reloaded を起動」→ メインダイアログが開き、`screenshot` / `dump_widgets` / `close_window` まで通った |
 | 21 | 再読込で QAction（メニュー/ツールバー）が重複しない | ✅ MORIZON を再読込しても、落ち着いた状態では 3 件のまま（2 回確認）。**同期の直後に数えると 2〜5 件とぶれる**（Qt の遅延削除・遅延生成）ため、手順は「`list_actions` → `reload_plugin` → 2 秒待つ → `list_actions`」。同期 recipe で数える設計は誤検出したので採用しない |
@@ -34,6 +34,14 @@
 | 22 | recipe `check_plugin_entrypoints` | ✅ MORIZON で正常（ok）、存在しない項目（`action not found`）、存在しないプラグイン（`plugin is not installed`）を確認（rc6）。画面を開く手順は [SCENARIOS.md](SCENARIOS.md) |
 | 23 | 他人のプラグインのダイアログ操作（森林資源メッシュ用国土基本図図郭作成 0.1.0-rc3） | ✅ `trigger_action` でモーダルを開き、`dump_widgets` で objectName 付き入力を取得、`set_widget` でコード入力・コンボ切替（stacked page 連動）・`screenshot`・`close_window` まで確認（rc6）。❗ 数字だけの文字列（"4"）が数値化されて拒否される不具合を発見 → rc7 で修正し、✅ rc7 で `系番号 = 4` の入力と「適用区域レイヤで自動判定」ページへの切替を実機確認。再起動後に対象プラグインが無効（active:false）のままだったため `reload_plugin` で読み込んだ（原因は未調査） |
 | 24 | recipe `check_plugin_metadata` | ✅ 実機: 森林プラグイン rc4・MORIZON・qgis_dev_probe は ok、存在しないプラグインは `metadata not readable` で ok:false。⬜ 「項目が欠けた実物」での検出は未確認（単体テストのみ: 偽の `qgis.utils` で description 欠落・空値を検出）。背景の実機所見: `description` が無い 0.1.0-rc3 は、ZIP 直後は動くが再起動後は自動で読み込まれず、起動ログに「メタデータを読み込み中にエラー」。rc4 で追加して解消（再起動で確認済み） |
+
+## 追加の実機確認（2026-10-28〜11-01 / 0.1.2・0.1.3 / Windows 11 / QGIS 3.44.13）
+
+- ✅ 回帰チェックリスト A〜E 相当: 再起動後にサーバーが自動起動しないこと（A1）、設定ダイアログが開くこと（A2）、`endpoint.json` の生成・消去（B1・B2）、再起動後に `allow_exec` が外れていること（B3）、`execute_code` の許可制（C）、`run_recipe` の許可ゲートと `smoke_test` の完走（D）。E（メッセージ表示）は起動・停止時の info ログを実機で確認し、警告級の発出経路が無いことをコード側で確認した
+- ✅ GUI 検証ループ（ダイアログを開く → `dump_widgets` → 操作 → `screenshot` → `read_log`）を 3 回反復（S5・S8 相当）。`readonly` での `set_widget` の `policy_denied` と `interactive` への復帰も確認（S7 相当）
+- ✅ `reload_plugin`: 開発対象プラグインとして CS Map Sheets（`csmap_sheets` 0.13.0）を再読み込みし、前後とも有効・処理ダイアログが開ける・新規 warning なしを確認（2026-11-01）。`qgis_dev_probe` 自身は行 8 のとおり設計で対象外
+- ✅ 実利用: 別プロジェクト（森林計画区データ）の確認用レシピで 5 レイヤーの読込・件数・CRS 照合と画面表示を確認（2026-10-27 の v0.3、2026-10-28 の v0.4）
+- ⬜ 0.1.3 で追加した設定ダイアログ内のドキュメントリンクの表示・遷移は、実機での目視が未実施
 
 ## 実機で見つかった不具合（単体テストでは検出できなかったもの）
 - rc2: Stop→Start 後に全ツールがタイムアウト（修正済み）。
