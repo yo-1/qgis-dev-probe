@@ -74,19 +74,13 @@ MIT (provisional).
 - MCP 側: Python 3.10+、`mcp>=2.3,<3`（v1 系 `FastMCP` とは非互換）。
 - 対応クライアント: stdio で MCP サーバーを起動できるもの。**ChatGPT の Web/アプリは対象外**（リモート HTTPS コネクタのみのため）。詳細は [docs/CLIENTS.md](docs/CLIENTS.md)。
 
-## セットアップ（PowerShell 7 / Windows 例）
+## セットアップ（概要）
 
-```powershell
-# 1. プラグインの zip を作る
-python scripts/package_plugin.py      # dist/qgis_dev_probe-<version>.zip
-# 2. QGIS: プラグイン > プラグインの管理とインストール > ZIP からインストール
-# 3. MCP サーバーを入れる（仮想環境推奨）
-python -m venv .venv ; .\.venv\Scripts\Activate.ps1
-pip install -e .
-```
+1. プラグイン: QGIS のプラグイン管理で「QGIS Dev Probe」を検索してインストールします（公式プラグインリポジトリ）。開発用は `python scripts/package_plugin.py` で ZIP を作り、「ZIP からインストール」でも入れられます。
+2. MCP サーバー: このリポジトリを clone し、仮想環境に `pip install -e .` で入れます。
+3. クライアントに MCP サーバーを登録し（[docs/CLIENTS.md](docs/CLIENTS.md)）、QGIS のメニュー「プラグイン → QGIS Dev Probe（開発用・AI実機検証）」から「サーバー起動 / Start server」を押します。モードは必要なときだけ `interactive` にします。
 
-QGIS のメニュー「プラグイン → QGIS Dev Probe（開発用・AI実機検証）」を開き、「サーバー起動 / Start server」。モードは必要なときだけ `interactive` にします。
-詳しい手順とトラブルシューティングは [docs/SETUP.md](docs/SETUP.md)、使い方は [docs/USAGE.md](docs/USAGE.md)、クライアント設定は [docs/CLIENTS.md](docs/CLIENTS.md)。
+詳しい手順とトラブルシューティングは [docs/SETUP.md](docs/SETUP.md)、使い方は [docs/USAGE.md](docs/USAGE.md)。
 
 ## 安全設計（要約）
 

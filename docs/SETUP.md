@@ -49,7 +49,7 @@ py -3 --version        # Python 3.10 以上と表示されること
 python --version       # 版が出ること。「Python」とだけ出るなら、Microsoft Store のエイリアス（下の注意）
 ```
 
-- QGIS 3.44（Qt5）。`metadata.txt` の qgisMinimumVersion も 3.44 としています。他バージョンは未検証です。
+- QGIS 3.44。`metadata.txt` の qgisMinimumVersion も 3.44 としています。他バージョンは未検証です。
 - Python 3.10 以上（MCP サーバー用。QGIS 内蔵の Python とは別です）。
 - **Windows の注意:** `python` が `...\WindowsApps\python.exe` を指している場合は、Microsoft Store の案内（アプリ実行エイリアス）で、実体ではありません。この文書では、`py -3` を使います。`py -3 --version` も通らない場合は、python.org から Python を入れてください。
 - `mcp>=2.3,<3`（`pip install -e .` で入ります。v1 系の `FastMCP` とは非互換）。

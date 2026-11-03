@@ -4,8 +4,27 @@
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-01
+
+plugins.qgis.org へ提出し、ポータルの自動チェックを全て通過。手動レビュー待ち（本書の記載時点）。
+
 ### Added
-- docs/SETUP.md（セットアップマニュアル）、docs/USAGE.md（取扱説明書）。
+- 設定ダイアログの説明パネルに、セットアップ手順とクライアント接続ガイド（GitHub）へのリンクを追加。
+- docs/CLIENTS.md の冒頭に「どの AI・どの形態で使えるか」の整理を追加（Claude Desktop / Code / ブラウザ / スマホ、ChatGPT の Chat / Work / Codex の可否・設定場所・前提条件）。
+
+### Changed
+- experimental を解除し、正式版とした。
+- docs/SETUP.md の導入手順を公式プラグインリポジトリ正規に変更（ZIP は開発用・代替として残置）。
+
+## [0.1.2] - 2026-10-27
+
+plugins.qgis.org へ 2026-10-27 に提出し、承認されて公式リポジトリで公開（承認は 2026-10-31 に確認）。
+
+### Changed
+- `run_recipe` を act 区分から exec 区分へ再分類し、`execute_code` と同じセッション限りの許可制の対象にした（GPT 検査報告書の指摘への対応）。
+
+### Added
+- Bandit の B102 について、該当箇所限定のゲートと反証テストを CI に追加。
 
 ## [0.1.0] - 2026-10-24
 
@@ -16,6 +35,7 @@
 - 未確認: Codex、他の QGIS バージョン、他の OS、HiDPI の別環境。
 
 ### Added
+- docs/SETUP.md（セットアップマニュアル）、docs/USAGE.md（取扱説明書）。
 - recipe `check_plugin_metadata`: インストール済みプラグインの metadata.txt の必須項目を、再起動せずに確認（description 欠落で再起動後に自動読み込みされなかった実例の再発防止）。
 - recipe `check_dialog_widgets`: 開いているダイアログに必須の objectName が揃い、有効かを確認（読み取りのみ）。
 - docs/SCENARIOS.md に「森林資源メッシュ用国土基本図図郭作成」の操作手順を追加。
