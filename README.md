@@ -5,7 +5,7 @@ QGIS プラグイン開発者向けの**開発専用**ツール。AI クライ�
 - QGIS 側: 開発用プラグイン `qgis_dev_probe`（localhost のみで待受。**既定は停止**）
 - AI 側: stdio の MCP サーバー `qgis-dev-probe-mcp`
 
-> **ステータス: 0.1.3 / 実機検証済み。** 公式プラグインリポジトリで 0.1.2 を公開中。0.1.3 は 2026-11-01 に提出し、手動レビュー待ち。Windows 11 + QGIS 3.44.13 で、Claude Desktop・Claude Code・Codex（デスクトップ）の接続、GUI の観察・操作、スクリーンショット、Processing 実行、プラグイン再読込、コード実行の許可ゲートまで実機で確認済みです。他の QGIS バージョン・macOS は未確認です。確認項目は [docs/VERIFY.md](docs/VERIFY.md)。
+> **ステータス: 0.1.3 / 実機検証済み。** 公式プラグインリポジトリで公開中（2026-11-01 に提出し、2026-11-04 に承認）。Windows 11 + QGIS 3.44.13 で、Claude Desktop・Claude Code・Codex（デスクトップ）の接続、GUI の観察・操作、スクリーンショット、Processing 実行、プラグイン再読込、コード実行の許可ゲートまで実機で確認済みです。他の QGIS バージョン・macOS は未確認です。確認項目は [docs/VERIFY.md](docs/VERIFY.md)。
 
 English summary: [English](#english).
 
@@ -16,7 +16,7 @@ English summary: [English](#english).
 - QGIS side: the `qgis_dev_probe` plugin (listens on localhost only, **stopped by default**)
 - AI side: a stdio MCP server, `qgis-dev-probe-mcp`
 
-> **Status: 0.1.3 / verified on a real machine.** Version 0.1.2 is published on the QGIS plugin repository; 0.1.3 was submitted on 2026-11-01 and is awaiting manual review. Verified on Windows 11 + QGIS 3.44.13 with Claude Desktop, Claude Code, and Codex (desktop): connection, GUI inspection and operation, screenshots, Processing runs, plugin reload, and the permission gates for code execution. Other QGIS versions and macOS are untested. See [docs/VERIFY.md](docs/VERIFY.md).
+> **Status: 0.1.3 / verified on a real machine.** Published on the QGIS plugin repository (submitted on 2026-11-01, approved on 2026-11-04). Verified on Windows 11 + QGIS 3.44.13 with Claude Desktop, Claude Code, and Codex (desktop): connection, GUI inspection and operation, screenshots, Processing runs, plugin reload, and the permission gates for code execution. Other QGIS versions and macOS are untested. See [docs/VERIFY.md](docs/VERIFY.md).
 
 ### What it does
 
