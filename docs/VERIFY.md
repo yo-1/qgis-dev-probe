@@ -43,6 +43,30 @@
 - ✅ 実利用: 別プロジェクト（森林計画区データ）の確認用レシピで 5 レイヤーの読込・件数・CRS 照合と画面表示を確認（2026-10-27 の v0.3、2026-10-28 の v0.4）
 - ⬜ 0.1.3 で追加した設定ダイアログ内のドキュメントリンクの表示・遷移は、実機での目視が未実施
 
+## 追加の実機確認（2026-11-07 / v0.1.3 / Windows 11 / QGIS 3.44.13 / SetupCheck）
+
+以下は Codex デスクトップからの実機実施報告に基づく記録。ローカルの報告書・JSONL ログの原本をこの GitHub 更新時点で直接照合したものではない。
+
+| 項目 | 結果 |
+|---|---|
+| MCP 接続 | ✅ `ping` は `pong=true`、`get_info` は QGIS 3.44.13-Solothurn / SetupCheck / 未保存プロジェクト / 0 レイヤーを返した |
+| S5 GUI | ✅ Dev Probe 設定ダイアログの `dump_widgets`（毎回 11 件）、`screenshot`、`close_window` に成功 |
+| S8 反復 | ✅ 上記 GUI 操作を 3 回反復。各回でウィンドウ閉鎖を確認し、確認可能な時点では `allowExecCheck=false`、新規 warning/error なし |
+| S7-1 | ✅ `allow_exec=OFF` の `execute_code("result = 1 + 1")` が `policy_denied` |
+| S7-2 | ✅ 1 行の一時レシピ `dev_probe_s7_test.py` を `list_recipes` で確認後、`run_recipe` が `policy_denied`。一時レシピは削除し、業務用レシピは維持 |
+| S7-3 | ✅ `readonly` で `set_widget(allowExecCheck, false)` が `policy_denied`。終了後は `interactive`、`allow_exec=OFF` に復旧 |
+| 再起動時の安全性 | ✅ 再起動直後は接続ファイルなし・`not_running`、手動起動後に接続成功。再起動後 `allowExecCheck=false` |
+| `reload_plugin`（追加試験） | ✅ 専用の一時プラグインを初回ロード後、再読み込みで `unload → construct → initGui` を記録。再読み込み後も有効、再読み込み時の warning/error なし |
+| 終了・後片付け | ✅ 一時プラグインをアンロード・削除し、QGIS を通常再起動。最終状態は SetupCheck、未保存・0 レイヤー、既存 9 プラグイン有効、一時プラグイン残存なし、`allow_exec=OFF`。最終試験で MCP タイムアウトなし |
+
+### 中断事象・未解明事項（2026-11-07）
+
+- 最初の S5/S8 試行では `allowExecCheck=true` を検出して中断。利用者が OFF に戻した後の再試験は合格したが、ON になった経緯は未特定。
+- 最初の専用 `reload_plugin` 試行では、プラグイン管理画面を開いた後に `main thread did not start the job within 15s` が発生。再読み込み前に中断し、一時ファイルを削除。その後 QGIS/Dev Probe は応答回復し、プラグイン管理画面を使わない再試験に成功。
+- MORIZON タグで UI スレッド約 3.5 秒および約 298.2 秒の非応答 info 記録、再起動時の MORIZON 初期化 warning が報告された。原因は未特定で、Dev Probe 自体の障害と断定しない。
+- 追加試験のローカル証跡（Codex 保存報告）：`dev_probe_reload_20261107_run2_report.md`、`dev_probe_reload_20261107_run2_lifecycle.jsonl`（Windows の Documents/ChatGPT/QGISプラグイン）。GitHub への証跡ファイル添付・Google Drive 保存は未確認。
+- 既存の 2026-11-01 の CS Map Sheets を用いた `reload_plugin` 成功記録とは別の試験である。
+
 ## 実機で見つかった不具合（単体テストでは検出できなかったもの）
 - rc2: Stop→Start 後に全ツールがタイムアウト（修正済み）。
 - rc3: `QgsFilterLineEdit` が `setValue` を持つためスピンボックス扱いされ、`set_widget` が文字列を拒否（修正済み）。
