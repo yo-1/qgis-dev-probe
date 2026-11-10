@@ -1,6 +1,6 @@
 # qgis-dev-probe
 
-QGIS プラグイン開発者向けの**開発専用**ツール。AI クライアント（Claude Desktop / Claude Code / Codex）から、実機の QGIS を観察・操作して**実機検証**できるようにします。
+QGIS プラグイン開発者向けの**開発・検証用**ツール。AI クライアント（Claude Desktop / Claude Code / Codex）から、実機の QGIS を観察・操作して**実機検証**できるようにします。
 
 - QGIS 側: 開発用プラグイン `qgis_dev_probe`（localhost のみで待受。**既定は停止**）
 - AI 側: stdio の MCP サーバー `qgis-dev-probe-mcp`
@@ -11,7 +11,7 @@ English summary: [English](#english).
 
 ## English
 
-**QGIS Dev Probe** is a **development-only** bridge that lets an AI client (Claude Desktop / Claude Code / Codex) inspect and operate a real, running QGIS over MCP, so the AI can verify on the actual machine that the plugin it built really works.
+**QGIS Dev Probe** is a bridge **for development and verification** that lets an AI client (Claude Desktop / Claude Code / Codex) inspect and operate a real, running QGIS over MCP, so the AI can verify on the actual machine that the plugin it built really works.
 
 - QGIS side: the `qgis_dev_probe` plugin (listens on localhost only, **stopped by default**)
 - AI side: a stdio MCP server, `qgis-dev-probe-mcp`
@@ -49,7 +49,7 @@ Full instructions and troubleshooting: [docs/SETUP.md](docs/SETUP.md) (in Japane
 - Stopped and `readonly` by default. The `execute_code` opt-in is never persisted and resets when QGIS restarts.
 - Screenshot output paths are fixed; callers cannot choose them.
 - This plugin contains two intentional `exec()` uses (the session-gated `execute_code` tool and local recipe loading), which are core to its purpose.
-- **Development machines only.** Do not install on shared or production QGIS setups. Threat model: [SECURITY.md](SECURITY.md).
+- **Intended for development and verification.** Not intended for permanent installation on a QGIS or profile used for production work. Threat model: [SECURITY.md](SECURITY.md).
 
 ### License
 
@@ -88,7 +88,17 @@ MIT (provisional).
 - 既定は停止 + readonly。`execute_code` の許可は保存されず、QGIS 再起動で失効。
 - スクリーンショットの出力先は固定（呼び出し側はパス指定不可）。
 - `exec()` の使用は 2 箇所のみで、いずれもこのプラグインの目的上必要な機能です。`execute_code`（セッションごとの明示許可制）と、ユーザーがローカルに置いたレシピファイルの読込です。This plugin contains two intentional `exec()` uses (the session-gated `execute_code` tool and local recipe loading), which are core to its purpose.
-- **開発機専用。** 共有・本番の QGIS には入れないでください。脅威モデルは [SECURITY.md](SECURITY.md)。
+- **開発・検証での使用を想定しています。** 本番業務で使う QGIS・プロファイルへの常設は想定していません。脅威モデルは [SECURITY.md](SECURITY.md)。
+
+## 使用上の注意
+
+Dev Probe は、AI（MCP クライアント）から QGIS の状態を読み取り、条件付きで操作するための**開発・検証用**プラグインです。
+
+- **開発用プロファイルで使用してください。** 本番業務で使う QGIS プロファイルへの常設は想定していません。重要なデータを開いたままの QGIS では使用しないでください。
+- **既定は停止・読み取り専用（readonly）です。** サーバーは手動で起動し、操作を許可するにはモードを interactive に切り替えます。
+- **任意の Python コード実行（execute_code）は、別のチェックボックスで明示的に許可した場合のみ**使えます。許可すると QGIS プロセスと同じ権限でコードが実行されるため、AI の指示内容を確認できる検証中だけ有効にしてください。許可は保存されず、QGIS の再起動で自動的に外れます。
+- 検証が終わったら、実行許可を外し、モードを readonly に戻して、サーバーを停止してください。
+- 通信はこのマシンの中だけです。サーバーは 127.0.0.1 / ::1 にのみ待ち受けし、外部のネットワークから接続することはできません。
 
 ## 開発
 

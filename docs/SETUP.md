@@ -2,7 +2,7 @@
 
 初めて導入する人が、**導入 → 起動 → 疎通確認**まで進むための手順です。ツールの使い方は [USAGE.md](USAGE.md)。
 
-> 開発専用です。共有・本番の QGIS には入れないでください（[SECURITY.md](../SECURITY.md)）。
+> 開発・検証用です。本番業務で使う QGIS・プロファイルへの常設は想定していません（[SECURITY.md](../SECURITY.md)）。
 > 実機確認済みの環境: Windows 11 / QGIS 3.44.13 / Claude Desktop・Claude Code・Codex デスクトップ（Windows の手順 2 は Python 3.10.2、Linux の手順 2 は Python 3.12.3 で確認）。他の QGIS バージョン・macOS は**未確認**です（[VERIFY.md](VERIFY.md)）。
 
 ## 0. この文書の約束事（先に読んでください）
