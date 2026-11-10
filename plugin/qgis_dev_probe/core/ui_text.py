@@ -43,10 +43,10 @@ def build_info_html(version: str, endpoint_file: str) -> str:
     return f"""
 <h3>QGIS Dev Probe</h3>
 <p><b>バージョン / Version:</b> {escape(version)}</p>
-<p><b>開発専用</b>です。AI クライアント（MCP）が QGIS の画面や処理を操作して実機検証するための
-ツールで、<b>本番機では使わないでください</b>。<br>
-<small>Development-only. Do not use on production machines.</small></p>
-<p>接続は <b>localhost のみ</b>、サーバーは手動で起動したときだけ動きます。</p>
+<p><b>開発・検証用</b>のツールです。AI クライアント（MCP）が QGIS の画面や処理を操作して実機検証するための
+もので、<b>本番業務で使う QGIS・プロファイルへの常設は想定していません</b>。<br>
+<small>For development and verification. Not intended for permanent installation on a QGIS or profile used for production work.</small></p>
+<p>接続は <b>localhost のみ</b>、サーバーは手動で起動したときだけ動きます。操作の許可と execute_code の許可は、検証中だけ有効にしてください。</p>
 <h4>モード / Mode</h4>
 <ul>
 <li><b>readonly</b>: 画面・レイヤ・ログの参照のみ。値の入力、クリック、処理の実行はできません。</li>
