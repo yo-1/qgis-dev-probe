@@ -2,7 +2,7 @@
 
 導入済み（[SETUP.md](SETUP.md)）の環境で、日常の使い方をまとめます。ツールの引数は MCP サーバーの定義（`src/qgis_dev_probe_mcp/server.py`）が正です。
 
-> 開発専用です。実機確認済みの範囲は [VERIFY.md](VERIFY.md)。
+> 開発・検証用です。実機確認済みの範囲は [VERIFY.md](VERIFY.md)。
 
 ## 1. 基本の流れ
 
