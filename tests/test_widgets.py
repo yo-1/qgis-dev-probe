@@ -376,6 +376,51 @@ class ProtectedSelfWidgetTests(unittest.TestCase):
         W.click(W.find_widget_for_mutation(other, object_name="allowExecCheck"), _immediate)
         self.assertTrue(exec_check.isChecked())
 
+    def _make_main_window_with_self_dialog(self):
+        dialog, mode, exec_check, _, _ = self._make_self_dialog()
+        app = FakeDialog("QgisApp", "QGIS", children=[dialog])
+        return app, mode, exec_check
+
+    def test_main_window_root_refuses_permission_widgets(self):
+        # C-1 回帰: 探索起点がメインウィンドウでも、配下の自ダイアログの
+        # 許可部品は名前指定・テキスト指定のどちらでも拒否される。
+        app, mode, exec_check = self._make_main_window_with_self_dialog()
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.find_widget_for_mutation(app, object_name="allowExecCheck")
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.find_widget_for_mutation(app, text="execute_code を許可")
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.find_widget_for_mutation(app, object_name="modeCombo")
+        self.assertFalse(exec_check.isChecked())
+        self.assertEqual(mode.currentIndex(), 0)
+
+    def test_main_window_root_other_dialog_same_names_allowed(self):
+        mode = FakeComboBox("modeCombo", ["a", "b"], data=["a", "b"])
+        exec_check = FakeCheckBox("allowExecCheck", "許可")
+        other = FakeDialog("someOtherDialog", "Other", children=[mode, exec_check])
+        app = FakeDialog("QgisApp", "QGIS", children=[other])
+        W.set_value(W.find_widget_for_mutation(app, object_name="modeCombo"), "b")
+        self.assertEqual(mode.currentText(), "b")
+        W.click(W.find_widget_for_mutation(app, object_name="allowExecCheck"), _immediate)
+        self.assertTrue(exec_check.isChecked())
+
+    def test_window_method_marks_widget_as_inside_self_dialog(self):
+        # 実 Qt では widget.window() が最上位ウィンドウを返す。探索ツリーに
+        # ダイアログが含まれなくても、window() が自ダイアログなら保護する。
+        class WindowedCheckBox(FakeCheckBox):
+            def __init__(self, name, text, top):
+                super().__init__(name, text)
+                self._top = top
+
+            def window(self):
+                return self._top
+
+        top = FakeDialog("qgisDevProbeDialog", "QGIS Dev Probe")
+        check = WindowedCheckBox("allowExecCheck", "execute_code を許可", top)
+        root = FakeDialog("someRoot", "Root", children=[check])
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.find_widget_for_mutation(root, object_name="allowExecCheck")
+
 
 class GrabTests(unittest.TestCase):
     def test_grab_saves_png(self):
