@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-17
+
 ### Added
 - 自分自身の許可部品の保護: 設定ダイアログのモード切替（`modeCombo`）と `execute_code` 許可チェック（`allowExecCheck`）を、ツール操作（`set_widget` / `click_widget`）の対象から除外した。観察（`dump_widgets` 等）は従来どおり可能で、他のダイアログの同名部品は対象外。
 
