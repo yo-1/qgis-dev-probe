@@ -356,14 +356,46 @@ def find_widget(
 
 
 # ---------------------------------------------------------------- 自分自身の許可部品の保護
-def is_protected_self_widget(root: Any, widget: Any) -> bool:
-    """root がプローブ自身の設定ダイアログで、widget がその許可部品なら True。
+def _is_self_dialog(widget: Any) -> bool:
+    return _safe(widget.objectName, "") == SELF_DIALOG_OBJECT_NAME
 
-    他のプラグインのダイアログに同名の部品があっても対象にしない（root の objectName で限定する）。
+
+def _subtree_contains(root: Any, target: Any) -> bool:
+    return any(node is target for node, _depth in iter_widgets(root, include_internal=True))
+
+
+def _inside_self_dialog(root: Any, widget: Any) -> bool:
+    """widget がプローブ自身のダイアログの内側にあるかを、探索起点に依存せず判定する。
+
+    実 Qt では widget.window() が最上位ウィンドウ（ダイアログ自身）を返すため、
+    メインウィンドウ起点の探索でも判定できる。window() を持たない偽ウィジェット
+    向けに、探索ツリー内の祖先関係でも判定する（ダイアログがツリーのどこに
+    あっても、その配下にある部品は内側とみなす）。
     """
-    if _safe(root.objectName, "") != SELF_DIALOG_OBJECT_NAME:
+    window_fn = getattr(widget, "window", None)
+    if callable(window_fn):
+        top = _safe(window_fn)
+        if top is not None and _is_self_dialog(top):
+            return True
+    if _is_self_dialog(root):
+        return True
+    for node, _depth in iter_widgets(root, include_internal=True):
+        if _is_self_dialog(node) and _subtree_contains(node, widget):
+            return True
+    return False
+
+
+def is_protected_self_widget(root: Any, widget: Any) -> bool:
+    """widget がプローブ自身の許可部品なら True。
+
+    部品名が許可部品であり、かつプローブ自身のダイアログの内側にある場合だけ
+    保護する。判定は探索の起点（ダイアログ自身・メインウィンドウ等）に依存
+    しない。他のダイアログやメインウィンドウ直下にある同名の部品（他プラグイン
+    の設定等）は対象にしない。
+    """
+    if _safe(widget.objectName, "") not in PROTECTED_SELF_WIDGET_NAMES:
         return False
-    return _safe(widget.objectName, "") in PROTECTED_SELF_WIDGET_NAMES
+    return _inside_self_dialog(root, widget)
 
 
 def ensure_widget_mutable(root: Any, widget: Any) -> None:
