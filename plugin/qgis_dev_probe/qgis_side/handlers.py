@@ -334,7 +334,7 @@ def h_set_widget(ctx: HandlerContext, args: dict) -> dict:
     window = _action_window(ctx, args)
     if "value" not in args:
         raise BadRequest("'value' is required")
-    widget = W.find_widget(
+    widget = W.find_widget_for_mutation(
         window,
         object_name=A.get_str(args, "object_name"),
         index=A.get_int(args, "index", minimum=0),
@@ -365,7 +365,7 @@ def h_trigger_action(ctx: HandlerContext, args: dict) -> dict:
 
 def h_click_widget(ctx: HandlerContext, args: dict) -> dict:
     window = _action_window(ctx, args)
-    widget = W.find_widget(
+    widget = W.find_widget_for_mutation(
         window,
         object_name=A.get_str(args, "object_name", required=False),
         text=A.get_str(args, "text", required=False),

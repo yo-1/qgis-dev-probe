@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+### Added
+- 自分自身の許可部品の保護: 設定ダイアログのモード切替（`modeCombo`）と `execute_code` 許可チェック（`allowExecCheck`）を、ツール操作（`set_widget` / `click_widget`）の対象から除外した。観察（`dump_widgets` 等）は従来どおり可能で、他のダイアログの同名部品は対象外。
+
 ### Changed
 - 警告文の表現を変更: 「開発専用・本番機では使用禁止」という禁止型の表記をやめ、「開発・検証用。本番業務で使う QGIS・プロファイルへの常設は想定していません」という用途と安全な使い方の案内に統一（metadata、ダイアログ、README、SETUP、USAGE、SECURITY）。README に「使用上の注意」の節を追加。安全設計の事実（localhost 限定、既定は停止・readonly、execute_code のセッション許可制）は不変。
 
