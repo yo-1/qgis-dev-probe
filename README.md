@@ -86,6 +86,7 @@ MIT (provisional).
 
 - 127.0.0.1 / ::1 以外にはバインドしない。接続ごとにトークン検証（`endpoint.json`、POSIX では 0600）。
 - 既定は停止 + readonly。`execute_code` の許可は保存されず、QGIS 再起動で失効。
+- モード切替と `execute_code` の許可チェックはツール操作の対象外で、プローブ自身のダイアログでも `set_widget` / `click_widget` では変更できない。許可を開けるのは人の手だけ。
 - スクリーンショットの出力先は固定（呼び出し側はパス指定不可）。
 - `exec()` の使用は 2 箇所のみで、いずれもこのプラグインの目的上必要な機能です。`execute_code`（セッションごとの明示許可制）と、ユーザーがローカルに置いたレシピファイルの読込です。This plugin contains two intentional `exec()` uses (the session-gated `execute_code` tool and local recipe loading), which are core to its purpose.
 - **開発・検証での使用を想定しています。** 本番業務で使う QGIS・プロファイルへの常設は想定していません。脅威モデルは [SECURITY.md](SECURITY.md)。

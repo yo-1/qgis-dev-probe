@@ -23,6 +23,12 @@ MAX_CANDIDATES_IN_ERROR = 10
 MAX_COMBO_ITEMS = 50
 MAX_TEXT_CHARS = 2000
 
+# プローブ自身の設定ダイアログ（dialog.py の objectName）と、その許可部品。
+# モード切替と execute_code の許可は「人の手でだけ開ける」が設計上の約束なので、
+# この2部品はツール操作（set_widget / click_widget）の対象から外す。観察は妨げない。
+SELF_DIALOG_OBJECT_NAME = "qgisDevProbeDialog"
+PROTECTED_SELF_WIDGET_NAMES = frozenset({"modeCombo", "allowExecCheck"})
+
 
 # ---------------------------------------------------------------- 基本情報
 def class_name(widget: Any) -> str:
@@ -347,6 +353,36 @@ def find_widget(
             details={"candidates": [describe_widget(w) for w in matches[:MAX_CANDIDATES_IN_ERROR]]},
         )
     return matches[0]
+
+
+# ---------------------------------------------------------------- 自分自身の許可部品の保護
+def is_protected_self_widget(root: Any, widget: Any) -> bool:
+    """root がプローブ自身の設定ダイアログで、widget がその許可部品なら True。
+
+    他のプラグインのダイアログに同名の部品があっても対象にしない（root の objectName で限定する）。
+    """
+    if _safe(root.objectName, "") != SELF_DIALOG_OBJECT_NAME:
+        return False
+    return _safe(widget.objectName, "") in PROTECTED_SELF_WIDGET_NAMES
+
+
+def ensure_widget_mutable(root: Any, widget: Any) -> None:
+    """許可部品の操作を拒否する。選択方法（objectName / 表示テキスト）によらず、解決後の実物で判定する。"""
+    if is_protected_self_widget(root, widget):
+        raise BadRequest(
+            "this widget controls the probe's own permissions and cannot be operated by tools; "
+            "change it by hand in the dialog",
+            details=describe_widget(widget),
+        )
+
+
+def find_widget_for_mutation(
+    root: Any, *, object_name: str | None = None, text: str | None = None, index: int | None = None
+) -> Any:
+    """操作系ツール（set_widget / click_widget）用の検索。許可部品はここで弾く。"""
+    widget = find_widget(root, object_name=object_name, text=text, index=index)
+    ensure_widget_mutable(root, widget)
+    return widget
 
 
 # ---------------------------------------------------------------- 操作

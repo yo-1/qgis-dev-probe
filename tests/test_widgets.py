@@ -320,6 +320,63 @@ class ClickAndCloseTests(unittest.TestCase):
             W.close_window(FakeWidget("x"), _immediate)
 
 
+class ProtectedSelfWidgetTests(unittest.TestCase):
+    """プローブ自身の設定ダイアログの許可部品はツール操作の対象外（観察は可）。"""
+
+    def _make_self_dialog(self):
+        mode = FakeComboBox("modeCombo", ["読み取り専用", "操作可"], data=["readonly", "interactive"])
+        exec_check = FakeCheckBox("allowExecCheck", "execute_code を許可")
+        recipe = FakeLineEdit("recipeDirEdit", "/tmp/recipes")
+        close = FakeButton("closeButton", "閉じる")
+        dialog = FakeDialog(
+            "qgisDevProbeDialog", "QGIS Dev Probe", children=[mode, exec_check, recipe, close]
+        )
+        return dialog, mode, exec_check, recipe, close
+
+    def test_set_on_permission_widgets_is_refused_and_unchanged(self):
+        dialog, mode, exec_check, _, _ = self._make_self_dialog()
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.set_value(W.find_widget_for_mutation(dialog, object_name="modeCombo"), "interactive")
+        self.assertEqual(mode.currentIndex(), 0)  # readonly のまま
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.set_value(W.find_widget_for_mutation(dialog, object_name="allowExecCheck"), True)
+        self.assertFalse(exec_check.isChecked())
+
+    def test_click_on_permission_widget_is_refused_by_name_and_by_text(self):
+        dialog, _, exec_check, _, _ = self._make_self_dialog()
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.click(W.find_widget_for_mutation(dialog, object_name="allowExecCheck"), _immediate)
+        with self.assertRaisesRegex(BadRequest, "own permissions"):
+            W.click(W.find_widget_for_mutation(dialog, text="execute_code を許可"), _immediate)
+        self.assertFalse(exec_check.isChecked())
+        self.assertEqual(exec_check.clicks, 0)
+
+    def test_permission_widgets_remain_observable(self):
+        dialog, mode, exec_check, _, _ = self._make_self_dialog()
+        self.assertIs(W.find_widget(dialog, object_name="modeCombo"), mode)
+        self.assertIs(W.find_widget(dialog, object_name="allowExecCheck"), exec_check)
+        names = [w["object_name"] for w in W.dump_widgets(dialog)["widgets"]]
+        self.assertIn("modeCombo", names)
+        self.assertIn("allowExecCheck", names)
+
+    def test_other_widgets_in_self_dialog_stay_mutable(self):
+        dialog, _, _, recipe, close = self._make_self_dialog()
+        result = W.set_value(W.find_widget_for_mutation(dialog, object_name="recipeDirEdit"), "/tmp/other")
+        self.assertEqual(result["after"], "/tmp/other")
+        self.assertEqual(recipe.text(), "/tmp/other")
+        W.click(W.find_widget_for_mutation(dialog, object_name="closeButton"), _immediate)
+        self.assertEqual(close.clicks, 1)
+
+    def test_same_names_in_other_dialogs_are_not_protected(self):
+        mode = FakeComboBox("modeCombo", ["a", "b"], data=["a", "b"])
+        exec_check = FakeCheckBox("allowExecCheck", "許可")
+        other = FakeDialog("someOtherDialog", "Other", children=[mode, exec_check])
+        W.set_value(W.find_widget_for_mutation(other, object_name="modeCombo"), "b")
+        self.assertEqual(mode.currentText(), "b")
+        W.click(W.find_widget_for_mutation(other, object_name="allowExecCheck"), _immediate)
+        self.assertTrue(exec_check.isChecked())
+
+
 class GrabTests(unittest.TestCase):
     def test_grab_saves_png(self):
         widget = FakeGrabbable("w")
