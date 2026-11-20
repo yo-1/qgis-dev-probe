@@ -23,7 +23,6 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .errors import BadRequest
-from .qgis_preflight import check_source
 
 NAME_RE = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_\-]{0,63}$")
 
@@ -82,7 +81,6 @@ def load_recipe(recipe_dir: str, name: str) -> Callable[[RecipeContext, dict], A
     sys.modules[module_name] = module  # dataclass 等が sys.modules を参照するため登録する
     try:
         source = path.read_text(encoding="utf-8")
-        check_source(source, str(path))
         exec(compile(source, str(path), "exec"), module.__dict__)  # noqa: S102 - 設計上の機能
     except BaseException:
         sys.modules.pop(module_name, None)
