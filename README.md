@@ -116,7 +116,7 @@ ruff check .
 
 MIT（暫定。変更する場合は LICENSE と pyproject.toml を更新）
 
-### QGIS Desktop内のテスト実行前チェック（Issue #17）
+### QGIS Desktopでの実行環境に関する注意（Issue #17）
 
 テストはQGIS不要/standalone専用/Desktop専用/両対応を区別してください。
 PythonからQGISをimportできることは、新しいQgsApplicationを生成してよいことを意味しません。
@@ -124,6 +124,6 @@ Desktopでは既存アプリを再初期化・終了しないでください。s
 
 Dev Probeはimport先のテストモジュールを含め、QGISアプリの初期化・終了の安全性を自動判定しません。実行前に対象ソースと実行環境を確認してください。
 テストコードの自動修正や例外の無視は行いません。実行時の失敗は既存のエラー/traceback経路で確認してください。
-run_recipeとexecute_codeのサーバーログにはDesktop/QGIS/Pythonの環境情報を記録します（コード全文は記録しません）。
+run_recipeとexecute_codeの実行時に、QGISメッセージログ（タグ `QgisDevProbe`）へDesktop/QGIS/Pythonの版（run_recipeはレシピ名も）を記録します。`read_log`（`tag=QgisDevProbe`）で確認できます。コード全文・引数は記録しません。
 実機の検証報告には固定commit、対象、実行方法、警告、例外とログを残してください。
 Windows/Desktop独立検証は別途必要です。Issue登録のみを検証完了とは扱いません。

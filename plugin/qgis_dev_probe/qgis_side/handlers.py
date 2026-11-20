@@ -24,6 +24,7 @@ from qgis.core import (
     QgsApplication,
     QgsFeatureRequest,
     QgsMapLayer,
+    QgsMessageLog,
     QgsProcessingFeedback,
     QgsProject,
     QgsRasterLayer,
@@ -44,6 +45,8 @@ from ..core.policy import Policy
 from . import widgets as W
 
 logger = logging.getLogger("qgis_dev_probe")
+
+LOG_TAG = "QgisDevProbe"  # plugin.py の _log() と同じタグ。read_log(tag=...) で絞り込める
 
 SELF_PLUGIN = __name__.split(".")[0]  # "qgis_dev_probe"。自分自身は再読込しない
 MAX_ROWS = 500
@@ -508,10 +511,22 @@ def h_reload_plugin(ctx: HandlerContext, args: dict) -> dict:
     }
 
 
+def _log_environment(source: str, target: str | None = None) -> None:
+    """実行経路の環境情報を QGIS メッセージログへ出す。
+
+    plugin.py の messageReceived → LogBuffer 経由で read_log に現れる（LogBuffer へは直接書かない＝二重記録を避ける）。
+    Python 標準 logging は QGIS 上でハンドラ未設定のため破棄される。コード全文・引数は記録しない。
+    """
+    parts = [f"{source} environment: QGIS Desktop", f"QGIS={Qgis.version()}", f"Python={sys.version.split()[0]}"]
+    if target is not None:
+        parts.append(f"target={target}")
+    QgsMessageLog.logMessage(" ".join(parts), LOG_TAG, Qgis.MessageLevel.Info)
+
+
 def h_run_recipe(ctx: HandlerContext, args: dict) -> Any:
     name = A.get_str(args, "name")
     recipe_args = A.get_dict(args, "args")
-    logger.info("run_recipe environment: QGIS Desktop QGIS=%s Python=%s target=%s", Qgis.version(), sys.version, name)
+    _log_environment("run_recipe", name)
     recipe_context = recipes.RecipeContext(
         iface=ctx.iface,
         project=QgsProject.instance(),
@@ -533,7 +548,7 @@ def h_execute_code(ctx: HandlerContext, args: dict) -> dict:
     if not ctx.config.allow_exec:  # ポリシーでも検査済み。ハンドラ側でも多重に確認する
         raise PolicyDenied("arbitrary code execution is disabled")
     code = A.get_str(args, "code")
-    logger.info("execute_code environment: QGIS Desktop, QGIS=%s Python=%s", Qgis.version(), sys.version)
+    _log_environment("execute_code")
     scope: dict[str, Any] = {
         "__name__": "__qgis_dev_probe_exec__",
         "iface": ctx.iface,
