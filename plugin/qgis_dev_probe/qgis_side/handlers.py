@@ -41,7 +41,6 @@ from ..core.errors import BadRequest, PolicyDenied, ProbeError
 from ..core.logbuffer import LogBuffer
 from ..core.paths import unique_path
 from ..core.policy import Policy
-from ..core.qgis_preflight import check_source
 from . import widgets as W
 
 logger = logging.getLogger("qgis_dev_probe")
@@ -512,7 +511,7 @@ def h_reload_plugin(ctx: HandlerContext, args: dict) -> dict:
 def h_run_recipe(ctx: HandlerContext, args: dict) -> Any:
     name = A.get_str(args, "name")
     recipe_args = A.get_dict(args, "args")
-    logger.info("run_recipe preflight: QGIS Desktop QGIS=%s Python=%s target=%s", Qgis.version(), sys.version, name)
+    logger.info("run_recipe environment: QGIS Desktop QGIS=%s Python=%s target=%s", Qgis.version(), sys.version, name)
     recipe_context = recipes.RecipeContext(
         iface=ctx.iface,
         project=QgsProject.instance(),
@@ -534,8 +533,7 @@ def h_execute_code(ctx: HandlerContext, args: dict) -> dict:
     if not ctx.config.allow_exec:  # ポリシーでも検査済み。ハンドラ側でも多重に確認する
         raise PolicyDenied("arbitrary code execution is disabled")
     code = A.get_str(args, "code")
-    logger.info("execute_code preflight: QGIS Desktop, QGIS=%s Python=%s", Qgis.version(), sys.version)
-    check_source(code, "<qgis_dev_probe.execute_code>")
+    logger.info("execute_code environment: QGIS Desktop, QGIS=%s Python=%s", Qgis.version(), sys.version)
     scope: dict[str, Any] = {
         "__name__": "__qgis_dev_probe_exec__",
         "iface": ctx.iface,
