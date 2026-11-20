@@ -122,10 +122,8 @@ MIT（暫定。変更する場合は LICENSE と pyproject.toml を更新）
 PythonからQGISをimportできることは、新しいQgsApplicationを生成してよいことを意味しません。
 Desktopでは既存アプリを再初期化・終了しないでください。standalone試験は外部QGIS Pythonで実行します。
 
-run_recipeとexecute_codeは、実行前にASTで直接QgsApplication生成/initQgis/exitQgis候補を検査し、候補があればパス・行付きBadRequestで実行を停止します。
-関数内の候補も保守的に検出するため、検出は欠陥確定を意味しません。ソースの自動修正や例外の無視はしません。
-この検査はsandboxではなく、import先・ラッパー・exec文字列・動的コードまで追跡しません。
-特に`import test_module`だけのコードから、そのモジュールの安全性は保証できません。実行前に対象ソースと環境分類をレビューしてください。
-失敗時は既存のエラー/traceback経路を維持します。execute_codeのサーバーログにはDesktop/QGIS/Python情報を記録します。
+Dev Probeはimport先のテストモジュールを含め、QGISアプリの初期化・終了の安全性を自動判定しません。実行前に対象ソースと実行環境を確認してください。
+テストコードの自動修正や例外の無視は行いません。実行時の失敗は既存のエラー/traceback経路で確認してください。
+run_recipeとexecute_codeのサーバーログにはDesktop/QGIS/Pythonの環境情報を記録します（コード全文は記録しません）。
 実機の検証報告には固定commit、対象、実行方法、警告、例外とログを残してください。
 Windows/Desktop独立検証は別途必要です。Issue登録のみを検証完了とは扱いません。
