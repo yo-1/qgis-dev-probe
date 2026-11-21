@@ -24,6 +24,7 @@ from qgis.core import (
     QgsApplication,
     QgsFeatureRequest,
     QgsMapLayer,
+    QgsMessageLog,
     QgsProcessingFeedback,
     QgsProject,
     QgsRasterLayer,
@@ -37,6 +38,7 @@ from .. import __version__
 from ..core import args as A
 from ..core import recipes
 from ..core.config import ProbeConfig
+from ..core.envinfo import format_environment_line
 from ..core.errors import BadRequest, PolicyDenied, ProbeError
 from ..core.logbuffer import LogBuffer
 from ..core.paths import unique_path
@@ -508,10 +510,21 @@ def h_reload_plugin(ctx: HandlerContext, args: dict) -> dict:
     }
 
 
+def _log_environment(tool: str, target: str | None = None) -> None:
+    """実行環境（Desktop / QGIS 版 / Python 版 / レシピ名）を QGIS メッセージログへ 1 行出す。
+
+    Python の logging（qgis_dev_probe logger）は既定で WARNING 以上しか出ず Info が破棄されるため使わない。
+    QgsMessageLog → messageReceived → plugin._on_message → LogBuffer の経路で read_log から観測できる。
+    LogBuffer へ直接 add すると二重記録になるので、この 1 経路だけにする。
+    """
+    line = format_environment_line(tool, Qgis.version(), platform.python_version(), target)
+    QgsMessageLog.logMessage(line, "QgisDevProbe", Qgis.MessageLevel.Info, notifyUser=False)
+
+
 def h_run_recipe(ctx: HandlerContext, args: dict) -> Any:
     name = A.get_str(args, "name")
     recipe_args = A.get_dict(args, "args")
-    logger.info("run_recipe environment: QGIS Desktop QGIS=%s Python=%s target=%s", Qgis.version(), sys.version, name)
+    _log_environment("run_recipe", target=name)
     recipe_context = recipes.RecipeContext(
         iface=ctx.iface,
         project=QgsProject.instance(),
@@ -533,7 +546,7 @@ def h_execute_code(ctx: HandlerContext, args: dict) -> dict:
     if not ctx.config.allow_exec:  # ポリシーでも検査済み。ハンドラ側でも多重に確認する
         raise PolicyDenied("arbitrary code execution is disabled")
     code = A.get_str(args, "code")
-    logger.info("execute_code environment: QGIS Desktop, QGIS=%s Python=%s", Qgis.version(), sys.version)
+    _log_environment("execute_code")
     scope: dict[str, Any] = {
         "__name__": "__qgis_dev_probe_exec__",
         "iface": ctx.iface,
