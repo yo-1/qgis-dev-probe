@@ -4,6 +4,15 @@
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-11-26
+
+### Changed
+- プラグイン名を英語表記に変更: `QGIS Dev Probe — AI Verification Bridge`（従来は `QGIS Dev Probe（開発用・AI実機検証ブリッジ）`）。
+- metadata の description / about を英語先行に変更し、核心の説明を追加: プルリクエストのたびに繰り返される実機検証であること、GUI の確認はヘッドレスではできないこと、接続は MCP によるもので特定の製品に限らないこと（実機確認済みは Claude Desktop / Claude Code / Codex）。
+- 「常設は想定していません」という表記をやめ、用途の区別を直接書く形に変更: 「日常のGIS業務で使うQGISに常駐させる道具ではありません。プラグイン開発の検証をするときに、開発・検証用のQGISに入れて使う道具です。」
+- tags に verification / ai / automation を追加。
+- コードの変更はなし（metadata と版番号のみ）。
+
 ## [0.1.4] - 2026-11-17
 
 ### 提出前監査による修正（2026-11-18）
