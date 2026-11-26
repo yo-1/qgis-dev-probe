@@ -44,8 +44,8 @@ def build_info_html(version: str, endpoint_file: str) -> str:
 <h3>QGIS Dev Probe</h3>
 <p><b>バージョン / Version:</b> {escape(version)}</p>
 <p><b>開発・検証用</b>のツールです。AI クライアント（MCP）が QGIS の画面や処理を操作して実機検証するための
-もので、<b>本番業務で使う QGIS・プロファイルへの常設は想定していません</b>。<br>
-<small>For development and verification. Not intended for permanent installation on a QGIS or profile used for production work.</small></p>
+もので、<b>日常の GIS 業務で使う QGIS に常駐させる道具ではありません</b>。プラグイン開発の検証をするときに、開発・検証用の QGIS に入れて使う道具です。<br>
+<small>For development and verification. Not a plugin to keep installed in the QGIS you use for everyday GIS work. Install it in a development / verification QGIS when you verify a plugin.</small></p>
 <p>接続は <b>localhost のみ</b>、サーバーは手動で起動したときだけ動きます。操作の許可と execute_code の許可は、検証中だけ有効にしてください。</p>
 <h4>モード / Mode</h4>
 <ul>

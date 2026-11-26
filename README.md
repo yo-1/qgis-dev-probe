@@ -49,7 +49,7 @@ Full instructions and troubleshooting: [docs/SETUP.md](docs/SETUP.md) (in Japane
 - Stopped and `readonly` by default. The `execute_code` opt-in is never persisted and resets when QGIS restarts.
 - Screenshot output paths are fixed; callers cannot choose them.
 - This plugin contains two intentional `exec()` uses (the session-gated `execute_code` tool and local recipe loading), which are core to its purpose.
-- **Intended for development and verification.** Not intended for permanent installation on a QGIS or profile used for production work. Threat model: [SECURITY.md](SECURITY.md).
+- **For development and verification.** Not a plugin to keep installed in the QGIS you use for everyday GIS work; install it in a development / verification QGIS when you verify a plugin. Threat model: [SECURITY.md](SECURITY.md).
 
 ### License
 
@@ -89,13 +89,13 @@ MIT (provisional).
 - モード切替と `execute_code` の許可チェックはツール操作の対象外で、プローブ自身のダイアログでも `set_widget` / `click_widget` では変更できない。許可を開けるのは人の手だけ。
 - スクリーンショットの出力先は固定（呼び出し側はパス指定不可）。
 - `exec()` の使用は 2 箇所のみで、いずれもこのプラグインの目的上必要な機能です。`execute_code`（セッションごとの明示許可制）と、ユーザーがローカルに置いたレシピファイルの読込です。This plugin contains two intentional `exec()` uses (the session-gated `execute_code` tool and local recipe loading), which are core to its purpose.
-- **開発・検証での使用を想定しています。** 本番業務で使う QGIS・プロファイルへの常設は想定していません。脅威モデルは [SECURITY.md](SECURITY.md)。
+- **開発・検証用の道具です。** 日常の GIS 業務で使う QGIS に常駐させる道具ではありません。プラグイン開発の検証をするときに、開発・検証用の QGIS に入れて使います。脅威モデルは [SECURITY.md](SECURITY.md)。
 
 ## 使用上の注意
 
 Dev Probe は、AI（MCP クライアント）から QGIS の状態を読み取り、条件付きで操作するための**開発・検証用**プラグインです。
 
-- **開発用プロファイルで使用してください。** 本番業務で使う QGIS プロファイルへの常設は想定していません。重要なデータを開いたままの QGIS では使用しないでください。
+- **開発用プロファイルで使用してください。** 日常の業務で使う QGIS に常駐させる道具ではありません。重要なデータを開いたままの QGIS では使用しないでください。
 - **既定は停止・読み取り専用（readonly）です。** サーバーは手動で起動し、操作を許可するにはモードを interactive に切り替えます。
 - **interactive モードは、実質的に任意コードの実行に近い権限です。** GUI 操作や Processing の組み合わせでコード実行に到達しうるため、切り替える場合はその前提で判断してください（詳細は SECURITY.md）。
 - **任意の Python コード実行（execute_code）は、別のチェックボックスで明示的に許可した場合のみ**使えます。許可すると QGIS プロセスと同じ権限でコードが実行されるため、AI の指示内容を確認できる検証中だけ有効にしてください。許可は保存されず、QGIS の再起動で自動的に外れます。
